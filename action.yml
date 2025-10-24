@@ -1,0 +1,54 @@
+name: 'Update LlamaCloud Deployment'
+description: 'Update a LlamaAgent deployment on LlamaCloud'
+inputs:
+  llama-cloud-api-key:
+    description: 'API key for LlamaCloud'
+    required: true
+    default: ''
+  llama-cloud-project-id:
+    description: 'Project ID for LlamaCloud'
+    required: true
+    default: ''
+  deployment-id:
+    description: 'ID of the deployed LlamaAgent'
+    required: true
+    default: ''
+  git-reference:
+    description: 'Git reference for deployment update'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+    
+    - name: Set up Python
+      run: uv python install 3.13
+      shell: bash
+    
+    - name: Authenticate with LlamaCloud
+      env:
+        LLAMA_CLOUD_API_KEY: ${{ inputs.llama-cloud-api-key }}
+        LLAMA_CLOUD_PROJECT_ID: ${{ inputs.llama-cloud-project-id }}
+      run: |
+        uvx llamactl auth token --project-id $LLAMA_CLOUD_PROJECT_ID --api-key $LLAMA_CLOUD_API_KEY --no-interactive
+      shell: bash
+    
+    - name: Update deployment (without git reference)
+      if: inputs.git-reference == ''
+      env:
+        DEPLOYMENT_ID: ${{ inputs.deployment-id }}
+      run: |
+        uvx llamactl deployments update $DEPLOYMENT_ID --no-interactive
+      shell: bash
+    
+    - name: Update deployment (with git reference)
+      if: inputs.git-reference != ''
+      env:
+        DEPLOYMENT_ID: ${{ inputs.deployment-id }}
+        GIT_REFERENCE: ${{ inputs.git-reference }}
+      run: |
+        uvx llamactl deployments update $DEPLOYMENT_ID --git-ref $GIT_REFERENCE --no-interactive
+      shell: bash
