@@ -52,3 +52,7 @@ runs:
       run: |
         uvx llamactl deployments update $DEPLOYMENT_ID --git-ref $GIT_REFERENCE --no-interactive
       shell: bash
+
+branding:
+  icon: 'refresh-ccw'
+  color: 'green'
