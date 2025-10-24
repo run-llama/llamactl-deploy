@@ -1,0 +1,22 @@
+name: Draft a release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  update_release_draft:
+    name: Draft release
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - name: Run Release Drafter
+        uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
